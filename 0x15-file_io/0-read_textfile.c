@@ -1,43 +1,28 @@
 #include "main.h"
+#include <stdlib.h>
 
 /**
- * len - string length
- * @s: string
- * Return: result
+ * read_textfile- Read text file print to STDOUT.
+ * @filename: text file being read
+ * @letters: number of letters to be read
+ * Return: w- actual number of bytes read and printed
+ *        0 when function fails or filename is NULL.
  */
-
-int len(char *s)
+ssize_t read_textfile(const char *filename, size_t letters)
 {
-	int i = 0;
+	char *buf;
+	ssize_t fd;
+	ssize_t w;
+	ssize_t t;
 
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
+		return (0);
+	buf = malloc(sizeof(char) * letters);
+	t = read(fd, buf, letters);
+	w = write(STDOUT_FILENO, buf, t);
 
-/**
- * create_file - creates a file
- * @filename: name of the file to create
- * @text_content: string to write to the file
- * Return: 1 or -1 (int)
- */
-
-int create_file(const char *filename, char *text_content)
-{
-	int openfile;
-	int content_len;
-
-	if (!filename)
-		return (-1);
-
-	if (text_content)
-		content_len = len(text_content);
-
-	openfile = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0600);
-	if (openfile == -1)
-		return (-1);
-
-	write(openfile, text_content, content_len);
-	close(openfile);
-	return (1);
+	free(buf);
+	close(fd);
+	return (w);
 }
